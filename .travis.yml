@@ -1,4 +1,2 @@
 language: java
 
-after_success: 
-	- mvn clean test jaco:report coveralls:report
