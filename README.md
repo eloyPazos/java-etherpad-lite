@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.com/eloyPazos/java-etherpad-lite.svg?branch=master)](https://travis-ci.com/eloyPazos/java-etherpad-lite)
-
+[![Build Status](https://travis-ci.org/eloyPazos/java-etherpad-lite.svg?branch=master)](https://travis-ci.org/eloyPazos/java-etherpad-lite)
 
 
 Java Etherpad Lite Client
