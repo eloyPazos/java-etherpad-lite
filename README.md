@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/eloyPazos/java-etherpad-lite.svg?branch=master)](https://travis-ci.org/eloyPazos/java-etherpad-lite)
-
+[![Coverage Status](https://coveralls.io/repos/github/eloyPazos/java-etherpad-lite/badge.svg?branch=master)](https://coveralls.io/github/eloyPazos/java-etherpad-lite?branch=master)
 
 Java Etherpad Lite Client
 =========================
