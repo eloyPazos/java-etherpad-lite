@@ -264,7 +264,7 @@ public class EPLiteClientIntegrationTest {
 //				"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&groupID=g.sVnGyuWcKe4WX4rt&validUntil=1542575145&authorID=a.6XbPIhBeJ2aCk7eG"))
 //				.respond(HttpResponse.response().withStatusCode(200).withBody(
 //						"{\"code\":0,\"message\":\"ok\",\"data\":{\"sessionID\":\"s.f7179037cd78e2f99b492e4ad085628d\"}}"));
-//
+
 //		// crea sesion 2
 //		mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createSession").withBody(
 //				"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&groupID=g.sVnGyuWcKe4WX4rt&validUntil=1574010045&authorID=a.6XbPIhBeJ2aCk7eG"))
@@ -300,7 +300,7 @@ public class EPLiteClientIntegrationTest {
 //				"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&sessionID=s.5c16699d34b57893cd76cdfda97d5d4a"))
 //				.respond(HttpResponse.response().withStatusCode(200)
 //						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
-//
+
 	// crea grupo
 //		Map groupResponse = client.createGroupIfNotExistsFor(groupMapper);
 //		String groupId = (String) groupResponse.get("groupID");
@@ -309,12 +309,10 @@ public class EPLiteClientIntegrationTest {
 //		String authorId = (String) authorResponse.get("authorID");
 //
 //		int sessionDuration = 8;
-//	Long validUntilResponse1 = ((new Date()).getTime() + (sessionDuration * 60L * 60L * 1000L)) / 1000L;
-//
 //		// crea sesion
 //		Map sessionResponse = client.createSession(groupId, authorId, sessionDuration);
 //		String firstSessionId = (String) sessionResponse.get("sessionID");
-//
+
 //		Calendar oneYearFromNow = Calendar.getInstance();
 //		oneYearFromNow.add(Calendar.YEAR, 1);
 //		Date sessionValidUntil = oneYearFromNow.getTime();
@@ -609,114 +607,114 @@ public class EPLiteClientIntegrationTest {
 	}
 
 	// funciona
-	@Test
-	public void create_pad_and_chat_about_it() {
-		String padID = "integration-test-pad-1";
-		String user1 = "user1";
-		String user2 = "user2";
-
-		// crear autor
-		System.out.println("*****************************************LISTADO");
-		mockServer.when(
-				HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createAuthorIfNotExistsFor").withBody(
-						"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&name=integration-author-1&authorMapper=user1"))
-				.respond(HttpResponse.response().withStatusCode(200)
-						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"authorID\":\"a.RMtRd8qqLZzHP9r2\"}}"));
-
-		Map response = client.createAuthorIfNotExistsFor(user1, "integration-author-1");
-
-		mockServer.when(
-				HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createAuthorIfNotExistsFor").withBody(
-						"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&name=integration-author-2&authorMapper=user1"))
-				.respond(HttpResponse.response().withStatusCode(200)
-						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"authorID\":\"a.SFGAvOhlcqgWgLaW\"}}"));
-
-		String author1Id = (String) response.get("authorID");
-		mockServer.when(
-				HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createAuthorIfNotExistsFor").withBody(
-						"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&name=integration-author-2&authorMapper=user2"))
-				.respond(HttpResponse.response().withStatusCode(200)
-						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"authorID\":\"a.RMtRd8qqLZzHP9r2\"}}"));
-
-		// crear autor 2
-		response = client.createAuthorIfNotExistsFor(user2, "integration-author-2");
-		String author2Id = (String) response.get("authorID");
-		// crear PAD
-
-		mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createPad").withBody(
-				"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1"))
-				.respond(HttpResponse.response().withStatusCode(200)
-						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
-
-		client.createPad(padID);
-		try {
+//	@Test
+//	public void create_pad_and_chat_about_it() {
+//		String padID = "integration-test-pad-1";
+//		String user1 = "user1";
+//		String user2 = "user2";
+//
+//		// crear autor
+//		System.out.println("*****************************************LISTADO");
+//		mockServer.when(
+//				HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createAuthorIfNotExistsFor").withBody(
+//						"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&name=integration-author-1&authorMapper=user1"))
+//				.respond(HttpResponse.response().withStatusCode(200)
+//						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"authorID\":\"a.RMtRd8qqLZzHP9r2\"}}"));
+//
+//		Map response = client.createAuthorIfNotExistsFor(user1, "integration-author-1");
+//
+//		mockServer.when(
+//				HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createAuthorIfNotExistsFor").withBody(
+//						"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&name=integration-author-2&authorMapper=user1"))
+//				.respond(HttpResponse.response().withStatusCode(200)
+//						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"authorID\":\"a.SFGAvOhlcqgWgLaW\"}}"));
+//
+//		String author1Id = (String) response.get("authorID");
+//		mockServer.when(
+//				HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createAuthorIfNotExistsFor").withBody(
+//						"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&name=integration-author-2&authorMapper=user2"))
+//				.respond(HttpResponse.response().withStatusCode(200)
+//						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"authorID\":\"a.RMtRd8qqLZzHP9r2\"}}"));
+//
+//		// crear autor 2
+//		response = client.createAuthorIfNotExistsFor(user2, "integration-author-2");
+//		String author2Id = (String) response.get("authorID");
+//		// crear PAD
+//
+//		mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createPad").withBody(
+//				"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1"))
+//				.respond(HttpResponse.response().withStatusCode(200)
+//						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+//
+//		client.createPad(padID);
+//		try {
+////			// concatena
+////
+//			mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/appendChatMessage").withBody(
+//					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1&text=hi+from+user1&authorID=a.RMtRd8qqLZzHP9r2"))
+//					.respond(HttpResponse.response().withStatusCode(200)
+//							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+//
+//			client.appendChatMessage(padID, "hi from user1", author1Id);
+//
+//			mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/appendChatMessage").withBody(
+//					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1&text=hi+from+user2&time="
+//							+ (System.currentTimeMillis() / 1000L) + "&authorID=a.RMtRd8qqLZzHP9r2"))
+//					.respond(HttpResponse.response().withStatusCode(200)
+//							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+//
 //			// concatena
+//			client.appendChatMessage(padID, "hi from user2", author2Id, System.currentTimeMillis() / 1000L);
 //
-			mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/appendChatMessage").withBody(
-					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1&text=hi+from+user1&authorID=a.RMtRd8qqLZzHP9r2"))
-					.respond(HttpResponse.response().withStatusCode(200)
-							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
-
-			client.appendChatMessage(padID, "hi from user1", author1Id);
-
-			mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/appendChatMessage").withBody(
-					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1&text=hi+from+user2&time="
-							+ (System.currentTimeMillis() / 1000L) + "&authorID=a.RMtRd8qqLZzHP9r2"))
-					.respond(HttpResponse.response().withStatusCode(200)
-							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
-
-			// concatena
-			client.appendChatMessage(padID, "hi from user2", author2Id, System.currentTimeMillis() / 1000L);
-
-			mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/appendChatMessage").withBody(
-					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1&text=gå+å+gjør+et+ærend&time="
-							+ (System.currentTimeMillis() / 1000L) + "&authorID=a.RMtRd8qqLZzHP9r2"))
-					.respond(HttpResponse.response().withStatusCode(200)
-							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
-
-			// concatena
-			client.appendChatMessage(padID, "gå å gjør et ærend", author1Id, System.currentTimeMillis() / 1000L);
-			// devolve o head
+//			mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/appendChatMessage").withBody(
+//					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1&text=gå+å+gjør+et+ærend&time="
+//							+ (System.currentTimeMillis() / 1000L) + "&authorID=a.RMtRd8qqLZzHP9r2"))
+//					.respond(HttpResponse.response().withStatusCode(200)
+//							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
 //
-			mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getChatHead").withBody(
-					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1"))
-					.respond(HttpResponse.response().withStatusCode(200)
-							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"chatHead\":2}}"));
-
-			response = client.getChatHead(padID);
-			long chatHead = (long) response.get("chatHead");
-			assertEquals(2, chatHead);
+//			// concatena
+//			client.appendChatMessage(padID, "gå å gjør et ærend", author1Id, System.currentTimeMillis() / 1000L);
+//			// devolve o head
+////
+//			mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getChatHead").withBody(
+//					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1"))
+//					.respond(HttpResponse.response().withStatusCode(200)
+//							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"chatHead\":2}}"));
+//
+//			response = client.getChatHead(padID);
+//			long chatHead = (long) response.get("chatHead");
+//			assertEquals(2, chatHead);
+////			// devolve o historial
+//			mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getChatHistory").withBody(
+//					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1"))
+//					.respond(HttpResponse.response().withStatusCode(200).withBody(
+//							"{\"code\":0,\"message\":\"ok\",\"data\":{\"messages\":[{\"text\":\"hi from user1\",\"userId\":\"a.RMtRd8qqLZzHP9r2\",\"time\":1542564554236,\"userName\":\"integration-author-1\"},{\"text\":\"hi from user2\",\"userId\":\"a.SFGAvOhlcqgWgLaW\",\"time\":1542564554,\"userName\":\"integration-author-2\"},{\"text\":\"gå å gjør et ærend\",\"userId\":\"a.RMtRd8qqLZzHP9r2\",\"time\":1542564554,\"userName\":\"integration-author-1\"}]}}"));
+//
+//			response = client.getChatHistory(padID);
+//			List chatHistory = (List) response.get("messages");
+//			assertEquals(3, chatHistory.size());
+//			assertEquals("gå å gjør et ærend", ((Map) chatHistory.get(2)).get("text"));
 //			// devolve o historial
-			mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getChatHistory").withBody(
-					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1"))
-					.respond(HttpResponse.response().withStatusCode(200).withBody(
-							"{\"code\":0,\"message\":\"ok\",\"data\":{\"messages\":[{\"text\":\"hi from user1\",\"userId\":\"a.RMtRd8qqLZzHP9r2\",\"time\":1542564554236,\"userName\":\"integration-author-1\"},{\"text\":\"hi from user2\",\"userId\":\"a.SFGAvOhlcqgWgLaW\",\"time\":1542564554,\"userName\":\"integration-author-2\"},{\"text\":\"gå å gjør et ærend\",\"userId\":\"a.RMtRd8qqLZzHP9r2\",\"time\":1542564554,\"userName\":\"integration-author-1\"}]}}"));
-
-			response = client.getChatHistory(padID);
-			List chatHistory = (List) response.get("messages");
-			assertEquals(3, chatHistory.size());
-			assertEquals("gå å gjør et ærend", ((Map) chatHistory.get(2)).get("text"));
-			// devolve o historial
-			this.mockServer.clear(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getChatHistory"));
-
-			mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getChatHistory").withBody(
-					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1&start=0&end=1"))
-					.respond(HttpResponse.response().withStatusCode(200).withBody(
-							" {\"code\":0,\"message\":\"ok\",\"data\":{\"messages\":[{\"text\":\"hi from user1\",\"userId\":\"a.RMtRd8qqLZzHP9r2\",\"time\":1542564554236,\"userName\":\"integration-author-1\"},{\"text\":\"hi from user2\",\"userId\":\"a.SFGAvOhlcqgWgLaW\",\"time\":1542564554,\"userName\":\"integration-author-2\"}]}}"));
-
-			response = client.getChatHistory(padID, 0, 1);
-			chatHistory = (List) response.get("messages");
-			assertEquals(2, chatHistory.size());
-			assertEquals("hi from user2", ((Map) chatHistory.get(1)).get("text"));
-
-			mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/deletePad").withBody(
-					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1"))
-					.respond(HttpResponse.response().withStatusCode(200)
-							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
-
-		} finally {
-			client.deletePad(padID);
-		}
-
-	}
+//			this.mockServer.clear(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getChatHistory"));
+//
+//			mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getChatHistory").withBody(
+//					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1&start=0&end=1"))
+//					.respond(HttpResponse.response().withStatusCode(200).withBody(
+//							" {\"code\":0,\"message\":\"ok\",\"data\":{\"messages\":[{\"text\":\"hi from user1\",\"userId\":\"a.RMtRd8qqLZzHP9r2\",\"time\":1542564554236,\"userName\":\"integration-author-1\"},{\"text\":\"hi from user2\",\"userId\":\"a.SFGAvOhlcqgWgLaW\",\"time\":1542564554,\"userName\":\"integration-author-2\"}]}}"));
+//
+//			response = client.getChatHistory(padID, 0, 1);
+//			chatHistory = (List) response.get("messages");
+//			assertEquals(2, chatHistory.size());
+//			assertEquals("hi from user2", ((Map) chatHistory.get(1)).get("text"));
+//
+//			mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/deletePad").withBody(
+//					"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad-1"))
+//					.respond(HttpResponse.response().withStatusCode(200)
+//							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+//
+//		} finally {
+//			client.deletePad(padID);
+//		}
+//
+//	}
 }
