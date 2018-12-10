@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -15,8 +16,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.matchers.Times;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
+import org.mockserver.model.Parameter;
 import org.mockserver.model.StringBody;
 
 /**
@@ -369,97 +372,292 @@ public class EPLiteClientIntegrationTest {
 //
 	}
 
-//	@Test
-//	public void create_pad_set_and_get_content() {
-//		String padID = "integration-test-pad";
-//
-//		// crea pad
-//		client.createPad(padID);
-//		try {
-//			// setea texto
-//			client.setText(padID, "gå å gjør et ærend");
-//			String text = (String) client.getText(padID).get("text");
-//			assertEquals("gå å gjør et ærend\n", text);
-//
-//			// setea HTML
-//			client.setHTML(padID, "<!DOCTYPE HTML><html><body><p>gå og gjøre et ærend igjen</p></body></html>");
-//
-//			// recupera HTML
-//			String html = (String) client.getHTML(padID).get("html");
-//			assertTrue(html, html.contains("g&#229; og gj&#248;re et &#230;rend igjen<br><br>"));
-//
-//			// recupera HTML
-//			html = (String) client.getHTML(padID, 2).get("html");
-//			assertEquals("<!DOCTYPE HTML><html><body><br></body></html>", html);
-//			// recupera texto
-//			text = (String) client.getText(padID, 2).get("text");
-//			assertEquals("\n", text);
-//
-//			// recupera revision
-//			long revisionCount = (long) client.getRevisionsCount(padID).get("revisions");
-//			assertEquals(3L, revisionCount);
-//
-//			// getRevisionChangeset
-//			String revisionChangeset = client.getRevisionChangeset(padID);
-//			assertTrue(revisionChangeset, revisionChangeset.contains("gå og gjøre et ærend igjen"));
-//			// getRevisionChangeset
-//
-//			revisionChangeset = client.getRevisionChangeset(padID, 2);
-//			assertTrue(revisionChangeset, revisionChangeset.contains("|1-j|1+1$\n"));
-//			// getDiffHTML
-//
-//			String diffHTML = (String) client.createDiffHTML(padID, 1, 2).get("html");
-//			assertTrue(diffHTML,
-//					diffHTML.contains("<span class=\"removed\">g&#229; &#229; gj&#248;r et &#230;rend</span>"));
-//			//Append
-//
-//			client.appendText(padID, "lagt til nå");
-//			text = (String) client.getText(padID).get("text");
-//			assertEquals("gå og gjøre et ærend igjen\nlagt til nå\n", text);
-//			//getAttributePool
-//
-//			Map attributePool = (Map) client.getAttributePool(padID).get("pool");
-//			assertTrue(attributePool.containsKey("attribToNum"));
-//			assertTrue(attributePool.containsKey("nextNum"));
-//			assertTrue(attributePool.containsKey("numToAttrib"));
-//			//SaveRevision
-//			//SaveRevision2
-//
-//			client.saveRevision(padID);
-//			client.saveRevision(padID, 2);
-//
-//			long savedRevisionCount = (long) client.getSavedRevisionsCount(padID).get("savedRevisions");
-//			assertEquals(2L, savedRevisionCount);
-//
-//			List savedRevisions = (List) client.listSavedRevisions(padID).get("savedRevisions");
-//			assertEquals(2, savedRevisions.size());
-//			assertEquals(2L, savedRevisions.get(0));
-//			assertEquals(4L, savedRevisions.get(1));
-//
-//			long padUsersCount = (long) client.padUsersCount(padID).get("padUsersCount");
-//			assertEquals(0, padUsersCount);
-//
-//			List padUsers = (List) client.padUsers(padID).get("padUsers");
-//			assertEquals(0, padUsers.size());
-//
-//			String readOnlyId = (String) client.getReadOnlyID(padID).get("readOnlyID");
-//			String padIdFromROId = (String) client.getPadID(readOnlyId).get("padID");
-//			assertEquals(padID, padIdFromROId);
-//
-//			List authorsOfPad = (List) client.listAuthorsOfPad(padID).get("authorIDs");
-//			assertEquals(0, authorsOfPad.size());
-//
-//			long lastEditedTimeStamp = (long) client.getLastEdited(padID).get("lastEdited");
-//			Calendar lastEdited = Calendar.getInstance();
-//			lastEdited.setTimeInMillis(lastEditedTimeStamp);
-//			Calendar now = Calendar.getInstance();
-//			assertTrue(lastEdited.before(now));
-//
-//			client.sendClientsMessage(padID, "test message");
-//		} finally {
-//			client.deletePad(padID);
-//		}
-//	}
+	@Test
+	public void create_pad_set_and_get_content() {
+
+		this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createPad")
+				.withBody(new StringBody(
+						"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+				.respond(HttpResponse.response().withStatusCode(200)
+						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+
+		String padID = "integration-test-pad";
+
+		// crea pad
+		client.createPad(padID);
+		try {
+
+			String caracteres = "";
+			try {
+				caracteres = new String("gå å gjør et ærend".getBytes(), "ISO-8859-1");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/setText")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad&text=g%C3%A5+%C3%A5+gj%C3%B8r+et+%C3%A6rend")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+
+			this.mockServer.when(
+					HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getText").withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")),
+					Times.exactly(1))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"text\":\"" + caracteres + "\\n\"}}"));
+
+			// setea texto
+			client.setText(padID, "gå å gjør et ærend");
+			String text = (String) client.getText(padID).get("text");
+			assertEquals("gå å gjør et ærend\n", text);
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/setHTML")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad&html=%3C%21DOCTYPE+HTML%3E%3Chtml%3E%3Cbody%3E%3Cp%3Eg%C3%A5+og+gj%C3%B8re+et+%C3%A6rend+igjen%3C%2Fp%3E%3C%2Fbody%3E%3C%2Fhtml%3E")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+
+			// setea HTML
+			client.setHTML(padID, "<!DOCTYPE HTML><html><body><p>gå og gjøre et ærend igjen</p></body></html>");
+
+			this.mockServer.when(
+					HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getHTML").withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")),
+					Times.exactly(1))
+					.respond(HttpResponse.response().withStatusCode(200).withBody(
+							"{\"code\":0,\"message\":\"ok\",\"data\":{\"html\":\"<!DOCTYPE HTML><html><body>g&#229; og gj&#248;re et &#230;rend igjen<br><br></body></html>\"}}"));
+
+			// recupera HTML
+			String html = (String) client.getHTML(padID).get("html");
+			assertTrue(html, html.contains("g&#229; og gj&#248;re et &#230;rend igjen<br><br>"));
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getHTML")
+					.withBody(new StringBody(
+							"rev=2&apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200).withBody(
+							"{\"code\":0,\"message\":\"ok\",\"data\":{\"html\":\"<!DOCTYPE HTML><html><body><br></body></html>\"}}"));
+
+			// recupera HTML
+			html = (String) client.getHTML(padID, 2).get("html");
+			assertEquals("<!DOCTYPE HTML><html><body><br></body></html>", html);
+			// recupera texto
+
+			this.mockServer.when(
+					HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getText").withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")),
+					Times.exactly(1))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"text\":\"\\n\"}}"));
+
+			text = (String) client.getText(padID, 2).get("text");
+			assertEquals("\n", text);
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getRevisionsCount")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"revisions\":3}}"));
+
+			// recupera revision
+			long revisionCount = (long) client.getRevisionsCount(padID).get("revisions");
+			assertEquals(3L, revisionCount);
+
+			try {
+				caracteres = new String("Z:1>r|1+r$gå og gjøre et ærend igjen".getBytes(), "ISO-8859-1");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getRevisionChangeset")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")),
+					Times.exactly(1))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":\"" + caracteres + "\\n\"}"));
+
+			// getRevisionChangeset
+			String revisionChangeset = client.getRevisionChangeset(padID);
+			assertTrue(revisionChangeset, revisionChangeset.contains("gå og gjøre et ærend igjen"));
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getRevisionChangeset")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":\"Z:j<i|1-j|1+1$\\n\"}"));
+
+			// getRevisionChangeset
+
+			revisionChangeset = client.getRevisionChangeset(padID, 2);
+			assertTrue(revisionChangeset, revisionChangeset.contains("|1-j|1+1$\n"));
+
+			this.mockServer
+					.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/createDiffHTML")
+							.withQueryStringParameters(Arrays.asList(
+									new Parameter("apikey",
+											"a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58"),
+									new Parameter("padID", "integration-test-pad"), new Parameter("startRev", "1"),
+									new Parameter("endRev", "2"))))
+					.respond(HttpResponse.response().withStatusCode(200).withBody(
+							"{\"code\":0,\"message\":\"ok\",\"data\":{\"html\":\"<style>\\n.removed {text-decoration: line-through; -ms-filter:'progid:DXImageTransform.Microsoft.Alpha(Opacity=80)'; filter: alpha(opacity=80); opacity: 0.8; }\\n</style><span class=\\\"removed\\\">g&#229; &#229; gj&#248;r et &#230;rend</span><br><br>\",\"authors\":[\"\"]}}"));
+
+			// getDiffHTML
+
+			String diffHTML = (String) client.createDiffHTML(padID, 1, 2).get("html");
+			assertTrue(diffHTML,
+					diffHTML.contains("<span class=\"removed\">g&#229; &#229; gj&#248;r et &#230;rend</span>"));
+			// Append
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/appendText")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad&text=lagt+til+n%C3%A5")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+
+			String caracteres1 = "";
+			String caracteres2 = "";
+			try {
+				caracteres1 = new String("gå og gjøre et ærend igjen".getBytes(), "ISO-8859-1");
+				caracteres2 = new String("lagt til nå".getBytes(), "ISO-8859-1");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getText")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"text\":\"" + caracteres1 + "\\n"
+									+ caracteres2 + "\\n\"}}"));
+
+			client.appendText(padID, "lagt til nå");
+			text = (String) client.getText(padID).get("text");
+
+			assertEquals("gå og gjøre et ærend igjen\nlagt til nå\n", text);
+			// getAttributePool
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getAttributePool")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200).withBody(
+							"{\"code\":0,\"message\":\"ok\",\"data\":{\"pool\":{\"numToAttrib\":{\"0\":[\"author\",\"\"],\"1\":[\"removed\",\"true\"]},\"attribToNum\":{\"author,\":0,\"removed,true\":1},\"nextNum\":2}}}"));
+
+			Map attributePool = (Map) client.getAttributePool(padID).get("pool");
+			assertTrue(attributePool.containsKey("attribToNum"));
+			assertTrue(attributePool.containsKey("nextNum"));
+			assertTrue(attributePool.containsKey("numToAttrib"));
+			// SaveRevision
+			// SaveRevision2
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/saveRevision")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/saveRevision")
+					.withBody(new StringBody(
+							"rev=2&apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+
+			client.saveRevision(padID);
+			client.saveRevision(padID, 2);
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getSavedRevisionsCount")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"savedRevisions\":2}}"));
+
+			long savedRevisionCount = (long) client.getSavedRevisionsCount(padID).get("savedRevisions");
+			assertEquals(2L, savedRevisionCount);
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/listSavedRevisions")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"savedRevisions\":[2,4]}}"));
+
+			List savedRevisions = (List) client.listSavedRevisions(padID).get("savedRevisions");
+			assertEquals(2, savedRevisions.size());
+			assertEquals(2L, savedRevisions.get(0));
+			assertEquals(4L, savedRevisions.get(1));
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/padUsersCount")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"padUsersCount\":0}}"));
+
+			long padUsersCount = (long) client.padUsersCount(padID).get("padUsersCount");
+			assertEquals(0, padUsersCount);
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/padUsers")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"padUsers\":[]}}"));
+
+			List padUsers = (List) client.padUsers(padID).get("padUsers");
+			assertEquals(0, padUsers.size());
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getReadOnlyID")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200).withBody(
+							"{\"code\":0,\"message\":\"ok\",\"data\":{\"readOnlyID\":\"r.7a11620167f68a195aed6ddd30e120da\"}}"));
+
+			String readOnlyId = (String) client.getReadOnlyID(padID).get("readOnlyID");
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getPadID")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&roID=r.7a11620167f68a195aed6ddd30e120da")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"padID\":\"integration-test-pad\"}}"));
+
+			String padIdFromROId = (String) client.getPadID(readOnlyId).get("padID");
+			assertEquals(padID, padIdFromROId);
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/listAuthorsOfPad")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"authorIDs\":[]}}"));
+
+			List authorsOfPad = (List) client.listAuthorsOfPad(padID).get("authorIDs");
+			assertEquals(0, authorsOfPad.size());
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getLastEdited")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"lastEdited\":1542314927208}}"));
+
+			long lastEditedTimeStamp = (long) client.getLastEdited(padID).get("lastEdited");
+			Calendar lastEdited = Calendar.getInstance();
+			lastEdited.setTimeInMillis(lastEditedTimeStamp);
+			Calendar now = Calendar.getInstance();
+			assertTrue(lastEdited.before(now));
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/sendClientsMessage")
+					.withBody(new StringBody(
+							"msg=test+message&apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{}}"));
+
+			client.sendClientsMessage(padID, "test message");
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/deletePad")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=integration-test-pad")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+
+		} finally {
+			client.deletePad(padID);
+		}
+	}
 
 	@Test
 	public void create_pad_move_and_copy() throws Exception {
