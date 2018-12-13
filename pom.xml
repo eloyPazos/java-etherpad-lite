@@ -113,6 +113,8 @@
 					</targetClasses>
 					<targetTests>
 						<param>net.gjerull.etherpad.client.EPLiteConnectionTest</param>
+						<param>net.gjerull.etherpad.client.EPLiteClientIntegrationTest</param>
+
 					</targetTests>
 
 
