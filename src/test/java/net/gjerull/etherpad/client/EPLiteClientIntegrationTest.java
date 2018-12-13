@@ -944,4 +944,107 @@ public class EPLiteClientIntegrationTest {
 		}
 
 	}
+
+	@Test
+	public void create_group_pads_and_list_them() throws Exception {
+		this.mockServer
+				.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createGroup").withBody(
+						new StringBody("apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58")))
+				.respond(HttpResponse.response().withStatusCode(200)
+						.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"groupID\":\"g.fszrLpaMMqJN0JxM\"}}"));
+
+		Map response = client.createGroup();
+		String groupId = (String) response.get("groupID");
+		String padName1 = "integration-test-1";
+		String padName2 = "integration-test-2";
+		try {
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createGroupPad")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&groupID=g.fszrLpaMMqJN0JxM&padName=integration-test-1")))
+					.respond(HttpResponse.response().withStatusCode(200).withBody(
+							"{\"code\":0,\"message\":\"ok\",\"data\":{\"padID\":\"g.fszrLpaMMqJN0JxM$integration-test-1\"}}"));
+
+			Map padResponse = client.createGroupPad(groupId, padName1);
+			assertTrue(padResponse.containsKey("padID"));
+			String padId1 = (String) padResponse.get("padID");
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/setPublicStatus")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=g.fszrLpaMMqJN0JxM%24integration-test-1&publicStatus=true")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+
+			client.setPublicStatus(padId1, true);
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getPublicStatus")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=g.fszrLpaMMqJN0JxM&padName=integration-test-1")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"publicStatus\":true}}"));
+
+			boolean publicStatus = (boolean) client.getPublicStatus(padId1).get("publicStatus");
+			assertTrue(publicStatus);
+
+			mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/setPassword")
+					.withBody(new StringBody(
+							"password=integration&apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=g.fszrLpaMMqJN0JxM%24integration-test-1")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+
+			client.setPassword(padId1, "integration");
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/isPasswordProtected")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=g.fszrLpaMMqJN0JxM&padName=integration-test-1")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"isPasswordProtected\":true}}"));
+
+			boolean passwordProtected = (boolean) client.isPasswordProtected(padId1).get("isPasswordProtected");
+			assertTrue(passwordProtected);
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/createGroupPad")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&groupID=g.fszrLpaMMqJN0JxM&padName=integration-test-2&text=Initial+text")))
+					.respond(HttpResponse.response().withStatusCode(200).withBody(
+							"{\"code\":0,\"message\":\"ok\",\"data\":{\"padID\":\"g.fszrLpaMMqJN0JxM$integration-test-2\"}}"));
+
+			padResponse = client.createGroupPad(groupId, padName2, "Initial text");
+			assertTrue(padResponse.containsKey("padID"));
+
+			String padId = (String) padResponse.get("padID");
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/getText")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&padID=g.fszrLpaMMqJN0JxM&padName=integration-test-2")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":{\"text\":\"Initial text\\n\"}}"));
+
+			String initialText = (String) client.getText(padId).get("text");
+			assertEquals("Initial text\n", initialText);
+
+			this.mockServer.when(HttpRequest.request().withMethod("GET").withPath("/api/1.2.13/listPads")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&groupID=g.fssgQhaTSqJN0RmJ")))
+					.respond(HttpResponse.response().withStatusCode(200).withBody(
+							"{\"code\":0,\"message\":\"ok\",\"data\":{\"padIDs\":[\"g.fssgQhaTSqJN0RmJ$integration-test-1\",\"g.fszrLpaMMqJN0JxM$integration-test-2\"]}}"));
+
+			Map padListResponse = client.listPads(groupId);
+
+			assertTrue(padListResponse.containsKey("padIDs"));
+			List padIds = (List) padListResponse.get("padIDs");
+
+			assertEquals(2, padIds.size());
+		} finally {
+
+			this.mockServer.when(HttpRequest.request().withMethod("POST").withPath("/api/1.2.13/deleteGroup")
+					.withBody(new StringBody(
+							"apikey=a04f17343b51afaa036a7428171dd873469cd85911ab43be0503d29d2acbbd58&groupID=g.fszrLpaMMqJN0JxM")))
+					.respond(HttpResponse.response().withStatusCode(200)
+							.withBody("{\"code\":0,\"message\":\"ok\",\"data\":null}"));
+
+			client.deleteGroup(groupId);
+		}
+	}
+
 }
