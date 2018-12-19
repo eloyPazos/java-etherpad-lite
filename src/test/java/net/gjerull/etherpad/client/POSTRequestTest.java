@@ -16,6 +16,12 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import etm.core.configuration.BasicEtmConfigurator;
+import etm.core.configuration.EtmManager;
+import etm.core.monitor.EtmMonitor;
+import etm.core.monitor.EtmPoint;
+import etm.core.renderer.SimpleTextRenderer;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ POSTRequest.class })
 public class POSTRequestTest {
@@ -41,8 +47,11 @@ public class POSTRequestTest {
 	@Mock
 	URLConnection conexion;
 
+	private static final EtmMonitor etmMonitor = EtmManager.getEtmMonitor();
+
 	@Test
 	public void testPOSTTRequest() throws Exception {
+		BasicEtmConfigurator.configure();
 
 		PowerMockito.whenNew(OutputStreamWriter.class).withAnyArguments().thenReturn(output);
 		PowerMockito.whenNew(InputStreamReader.class).withAnyArguments().thenReturn(input);
@@ -50,17 +59,40 @@ public class POSTRequestTest {
 		PowerMockito.whenNew(BufferedReader.class).withAnyArguments().thenReturn(buffer);
 		Mockito.when(buffer.readLine()).thenReturn("readline", null);
 		Mockito.when(url.openConnection()).thenReturn(conexion);
+		etmMonitor.start();
 
-		Request postRequest = new POSTRequest(url, "readline");
+		EtmPoint point = etmMonitor.createPoint("POSTRequest");
+		Request postRequest = null;
+		try {
 
-		assertEquals("readline", postRequest.send());
+			postRequest = new POSTRequest(url, "readline");
+
+			assertEquals("readline", postRequest.send());
+
+		} finally {
+			point.collect();
+		}
 
 		Mockito.when(buffer.readLine()).thenReturn("", null);
-		assertEquals("", postRequest.send());
+		point = etmMonitor.createPoint("POSTRequest");
+		try {
+			assertEquals("", postRequest.send());
+		} finally {
+			point.collect();
+		}
 
 		Mockito.when(buffer.readLine()).thenReturn(null, null);
-		assertEquals("", postRequest.send());
+		point = etmMonitor.createPoint("POSTRequest");
 
+		try {
+
+			assertEquals("", postRequest.send());
+		} finally {
+			point.collect();
+		}
+
+		etmMonitor.render(new SimpleTextRenderer());
+		etmMonitor.stop();
 	}
 
 }

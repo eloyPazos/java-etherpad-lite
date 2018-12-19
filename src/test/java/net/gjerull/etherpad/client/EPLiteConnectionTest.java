@@ -9,18 +9,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import etm.core.configuration.BasicEtmConfigurator;
+import etm.core.configuration.EtmManager;
+import etm.core.monitor.EtmMonitor;
+import etm.core.monitor.EtmPoint;
+import etm.core.renderer.SimpleTextRenderer;
 
 public class EPLiteConnectionTest {
 	private static final String RESPONSE_TEMPLATE = "{\n" + "  \"code\": %d,\n" + "  \"message\": \"%s\",\n"
 			+ "  \"data\": %s\n" + "}";
 	private static final String API_VERSION = "1.2.12";
 	private static final String ENCODING = "UTF-8";
+	private static final EtmMonitor etmMonitor = EtmManager.getEtmMonitor();
+
+	@Before
+	public void prepare() {
+		BasicEtmConfigurator.configure();
+	}
+
+	public void display() {
+		etmMonitor.render(new SimpleTextRenderer());
+		etmMonitor.stop();
+	}
 
 	@Test
 	public void domain_with_trailing_slash_when_construction_an_api_path() throws Exception {
+		prepare();
 		EPLiteConnection connection = new EPLiteConnection("http://example.com/", "apikey", API_VERSION, ENCODING);
-		String apiMethodPath = connection.apiPath("exampleMethod");
+		etmMonitor.start();
+		EtmPoint point = etmMonitor.createPoint("apiPath");
+		String apiMethodPath = null;
+		try {
+
+			apiMethodPath = connection.apiPath("exampleMethod");
+		} finally {
+			point.collect();
+		}
+		display();
 		assertEquals("/api/1.2.12/exampleMethod", apiMethodPath);
 	}
 
