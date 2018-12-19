@@ -75,6 +75,27 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.graphwalker</groupId>
+			<artifactId>graphwalker-core</artifactId>
+			<version>3.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.graphwalker</groupId>
+			<artifactId>graphwalker-io</artifactId>
+			<version>3.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId> org.graphwalker</groupId>
+			<artifactId>graphwalker-java</artifactId>
+			<version>3.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.graphwalker</groupId>
+			<artifactId>graphwalker-maven-plugin</artifactId>
+			<version>3.4.2</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>fm.void.jetm</groupId>
@@ -89,12 +110,12 @@
 			<scope>test</scope>
 		</dependency>
 
-    <dependency>
-      <groupId>org.powermock</groupId>
-      <artifactId>powermock-api-mockito2</artifactId>
-      <version>2.0.0-RC.4</version>
-      <scope>test</scope>
-    </dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito2</artifactId>
+			<version>2.0.0-RC.4</version>
+			<scope>test</scope>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.pholser/junit-quickcheck-core -->
 		<dependency>
 			<groupId>com.pholser</groupId>
@@ -141,7 +162,28 @@
 	<build>
 		<plugins>
 
-
+			<plugin>
+				<groupId>org.graphwalker</groupId>
+				<artifactId>graphwalker-maven-plugin</artifactId>
+				<version>3.4.2</version>
+				<!-- Bind goals to the default lifecycle -->
+				<executions>
+					<execution>
+						<id>generate-test-sources</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>generate-test-sources</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<groupId>org.pitest</groupId>
