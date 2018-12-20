@@ -202,6 +202,10 @@
 					<targetTests>
 						<param>net.gjerull.etherpad.client.EPLiteConnectionTest</param>
 						<param>net.gjerull.etherpad.client.EPLiteClientIntegrationTest</param>
+						<param>net.gjerull.etherpad.client.EPLiteClientRandomTest</param>
+						<param>net.gjerull.etherpad.client.EPLiteGETRequestTest</param>
+						<param>net.gjerull.etherpad.client.EPLitePOSTRequestTest</param>
+						
 
 					</targetTests>
 
